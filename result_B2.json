@@ -1,0 +1,13 @@
+คุณฟรี แก้ Bug #1 เรียบร้อยแล้ว
+
+เปลี่ยนเฉพาะ [server.js](D:/AI-Workspace/projects/ticket-tracking-relay/server.js:178): เพิ่ม Express error-handling middleware สำหรับ malformed JSON ให้ตอบ `400` เป็น JSON `{"error":"Malformed JSON body"}` และไม่ปล่อย HTML stack trace/file path ออกมา
+
+เขียน handoff สำหรับ QA แล้วที่ [HANDOFF_B2.md](D:/AI-Workspace/projects/ticket-tracking-relay/HANDOFF_B2.md:1)
+
+Verify แล้วทั้งสองคำสั่งจาก `HANDOFF_C.md`:
+- `POST /api/tickets` malformed JSON ได้ `HTTP/1.1 400 Bad Request`, `Content-Type: application/json; charset=utf-8`
+- `PATCH /api/tickets/TCK-1002/status` malformed JSON ได้ผลเหมือนกัน
+- body จริง: `{"error":"Malformed JSON body"}`
+
+ไม่มี server ค้างที่ port 3000 หลังจบงานครับ
+

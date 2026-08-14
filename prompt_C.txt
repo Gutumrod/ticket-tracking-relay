@@ -1,0 +1,23 @@
+You are Agent C — QA Tester.
+
+There is a file HANDOFF_B.md in this folder (D:/AI-Workspace/projects/ticket-tracking-relay/) written by Agent B (Developer). It is the ONLY source of truth you have about what was built and how to test it — read it fully first. You do not have access to any other spec or the original task description.
+
+Your job: actually run this application and test it for real (not just read the code).
+
+Do this:
+1. Install and start the app per HANDOFF_B.md's instructions.
+2. Go through every acceptance-criterion test step listed in HANDOFF_B.md and actually execute it (via curl/API calls and/or checking the served HTML/behavior) — don't just assume it works, run it and check the real response/output.
+3. Additionally test edge cases beyond what's listed, at minimum:
+   - Empty/missing required fields on ticket creation
+   - Invalid/garbage values for priority and status
+   - Requesting a ticket ID that doesn't exist
+   - Invalid status transitions (skipping states, going backwards where not allowed, etc.)
+   - Malformed JSON / wrong content-type on requests
+4. Check the dashboard summary counts actually match the real ticket data after creating/updating several tickets.
+
+When done, write a file HANDOFF_C.md in this same folder with:
+- A clear PASS/FAIL verdict per acceptance criterion and per edge case you tested, with the actual command/request and actual observed result (not expected — what you actually saw).
+- A numbered list of any bugs found: what you did, what you expected, what actually happened, severity.
+- Overall verdict: PASS (everything works, no bugs) or FAIL (bugs found, needs fixes).
+
+If you find ANY bugs, do not fix them yourself — only report them in HANDOFF_C.md. Stop the server when you're done testing.

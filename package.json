@@ -1,0 +1,16 @@
+{
+  "name": "ticket-tracking-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Issue reporting and ticket tracking MVP",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.22.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

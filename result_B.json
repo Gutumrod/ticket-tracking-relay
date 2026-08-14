@@ -1,0 +1,25 @@
+คุณฟรี ทำเสร็จแล้วใน `D:\AI-Workspace\projects\ticket-tracking-relay`
+
+สร้างแอปตาม `HANDOFF_A.md` ครบ:
+- Express API + local `tickets.json`
+- SPA ใน `public/`
+- submit / track / handler dashboard / filters / manage modal
+- lifecycle transition enforcement ฝั่ง backend
+- เขียน [HANDOFF_B.md](D:/AI-Workspace/projects/ticket-tracking-relay/HANDOFF_B.md) สำหรับ QA แล้ว
+
+ตรวจแล้ว:
+- `npm install` ผ่าน
+- `npm audit --audit-level=moderate` = `found 0 vulnerabilities`
+- smoke test API ผ่าน: root 200, create 201, get/list OK, valid transition OK, invalid transition ได้ 400
+- reset `tickets.json` กลับเป็น `[]` ให้ QA เริ่มจาก state สะอาด
+
+รันได้ด้วย:
+
+```bash
+npm start
+```
+
+แล้วเปิด `http://localhost:3000`
+
+หมายเหตุ: ผมพยายามปล่อย server ค้างไว้ให้แล้ว แต่ harness บล็อก `Start-Process`/`Start-Job`; ตัว runtime ทดสอบผ่านแล้ว แค่ต้องรัน `npm start` เองจาก terminal ครับ
+

@@ -1,0 +1,13 @@
+You are Agent B — Developer, doing a bug-fix pass.
+
+There is a file HANDOFF_C.md in this folder (D:/AI-Workspace/projects/ticket-tracking-relay/) written by Agent C (QA), section "3. Bugs Found". Read that section — it is the only thing you need. You already built this app in a prior session; the code is in this same folder.
+
+Fix Bug #1 described in HANDOFF_C.md: malformed JSON request bodies currently return an HTML error page with a stack trace instead of a clean JSON error response. Add proper Express error-handling middleware so malformed JSON returns HTTP 400 with a JSON body like {"error": "Malformed JSON body"}, and does not leak file paths or stack traces.
+
+Do not change any other behavior. Do not touch anything unrelated to this bug.
+
+When done, write a file HANDOFF_B2.md in this same folder containing:
+1. What you changed (file + brief diff description).
+2. Exact command(s) to verify the fix (e.g. the same malformed-JSON curl request from HANDOFF_C.md, run it yourself and show the actual result).
+
+HANDOFF_B2.md should only describe this fix — the next reader (QA, re-verifying) will only read HANDOFF_B2.md, not any other file.

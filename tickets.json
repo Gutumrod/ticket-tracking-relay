@@ -1,0 +1,90 @@
+[
+  {
+    "id": "TCK-1001",
+    "title": "API test",
+    "description": "Created from curl",
+    "reporter_name": "QA",
+    "priority": "High",
+    "status": "IN_PROGRESS",
+    "handler_notes": "Reopen",
+    "created_at": "2026-08-08T14:23:54.238Z",
+    "updated_at": "2026-08-08T14:24:49.417Z"
+  },
+  {
+    "id": "TCK-1002",
+    "title": "Default priority",
+    "description": "No priority field",
+    "reporter_name": "QA",
+    "priority": "Medium",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:23:55.378Z",
+    "updated_at": "2026-08-08T14:23:55.378Z"
+  },
+  {
+    "id": "TCK-1003",
+    "title": "Fresh ticket for invalid transition test",
+    "description": "Testing invalid jump",
+    "reporter_name": "QA",
+    "priority": "Low",
+    "status": "IN_PROGRESS",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:24:22.979Z",
+    "updated_at": "2026-08-08T14:25:16.764Z"
+  },
+  {
+    "id": "TCK-1004",
+    "title": "Missing title",
+    "description": "No title",
+    "reporter_name": "QA",
+    "priority": "High",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:24:33.259Z",
+    "updated_at": "2026-08-08T14:24:33.259Z"
+  },
+  {
+    "id": "TCK-1005",
+    "title": "Bad status attempt",
+    "description": "Testing",
+    "reporter_name": "QA",
+    "priority": "Medium",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:24:35.526Z",
+    "updated_at": "2026-08-08T14:24:35.526Z"
+  },
+  {
+    "id": "TCK-1006",
+    "title": "Spaced",
+    "description": "Spaced desc",
+    "reporter_name": "Spaced Name",
+    "priority": "High",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:25:10.053Z",
+    "updated_at": "2026-08-08T14:25:10.053Z"
+  },
+  {
+    "id": "TCK-1007",
+    "title": "Test no content type",
+    "description": "desc",
+    "reporter_name": "QA",
+    "priority": "Medium",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:25:11.183Z",
+    "updated_at": "2026-08-08T14:25:11.183Z"
+  },
+  {
+    "id": "TCK-1008",
+    "title": "Regression test ticket",
+    "description": "Verifying normal POST still works",
+    "reporter_name": "Agent C",
+    "priority": "High",
+    "status": "REPORTED",
+    "handler_notes": "",
+    "created_at": "2026-08-08T14:31:37.620Z",
+    "updated_at": "2026-08-08T14:31:37.620Z"
+  }
+]

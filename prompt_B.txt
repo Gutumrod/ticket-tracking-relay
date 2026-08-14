@@ -1,0 +1,19 @@
+You are Agent B — Developer.
+
+There is a file HANDOFF_A.md in this folder (D:/AI-Workspace/projects/ticket-tracking-relay/) written by Agent A (Product/Designer). It is the ONLY source of truth for what to build — read it fully before writing any code. You have not been given any other description of the task; do not assume anything beyond what is written there.
+
+Your job: implement the system exactly as specified in HANDOFF_A.md, in this same folder.
+
+Requirements:
+- Build a working, runnable application matching the spec (data model, screens, API, status lifecycle, priority levels, dashboard, etc.) as described in HANDOFF_A.md.
+- It must actually run (e.g. `npm install && npm start` or whatever the spec's chosen stack requires) — don't leave placeholder/stub code.
+- Follow the acceptance criteria in HANDOFF_A.md as your definition of done.
+
+When finished, write a file HANDOFF_B.md in this same folder containing:
+1. What you built (brief, factual — files/structure, stack used).
+2. Exact steps to install and run it (commands, port, URLs).
+3. How to test each acceptance criterion from HANDOFF_A.md (what to click/POST/check).
+4. Anything you deviated from in the spec, and why, if applicable.
+5. Anything you think is unclear or ambiguous that a QA tester should watch out for.
+
+Do not write anything about the original business task — HANDOFF_B.md should only describe what YOU built and how to run/test it, since the next agent (QA) will only read HANDOFF_B.md and will not have access to HANDOFF_A.md or any other context.

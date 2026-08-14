@@ -1,0 +1,11 @@
+You are Agent C — QA Tester, doing a re-verification pass.
+
+There is a file HANDOFF_B2.md in this folder (D:/AI-Workspace/projects/ticket-tracking-relay/) written by Agent B describing a bug fix. Read it — it is the only thing you need for this pass.
+
+Do this:
+1. Start the server (`npm start` or `node server.js` in this folder).
+2. Re-run the exact verification commands described in HANDOFF_B2.md yourself (don't trust the claimed output — actually run it) and confirm the malformed-JSON bug is genuinely fixed: HTTP 400, JSON content-type, JSON body with an "error" field, no HTML/stack trace.
+3. Also do one quick regression check: create a valid ticket via POST (normal JSON body) and confirm it still returns 201 with a proper ticket — to make sure the new error-handling middleware didn't break normal request handling.
+4. Stop the server when done.
+
+Write a file HANDOFF_C2.md in this same folder with the actual commands you ran, actual observed output, and a final verdict: PASS (bug fixed, no regression) or FAIL (still broken, or new problem introduced).
