@@ -75,9 +75,28 @@
         <div id="track-result"></div>
       </section>
 
+      <section id="login-view" class="view hidden">
+        <div class="section-head">
+          <h1>Handler Login</h1>
+        </div>
+        <form id="login-form" class="panel" novalidate>
+          <label>
+            <span>Username</span>
+            <input id="login-username" name="username" type="text" required>
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="login-password" name="password" type="password" required>
+          </label>
+          <p id="login-error" class="field-error"></p>
+          <button class="primary" type="submit">Log In</button>
+        </form>
+      </section>
+
       <section id="dashboard-view" class="view hidden">
         <div class="section-head">
           <h1>Handler Dashboard</h1>
+          <button id="logout-button" type="button">Log Out</button>
         </div>
 
         <div class="metrics">

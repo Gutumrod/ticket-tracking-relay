@@ -1,172 +1,120 @@
 const express = require("express");
-const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+const { createCredentialStoreAdapter } = require("./modules/auth/credential-store-adapter");
+const { requireUser } = require("./modules/auth/context");
+const { requireRole } = require("./modules/auth/guards");
+const { AuthError } = require("./modules/auth/error");
+const { ensureUsersFile, findUserByUsername, verifyPassword } = require("./lib/users");
+const { createJsonFileStore } = require("./modules/ticket-tracker/json-file-store");
+const { createTicketRoutes } = require("./modules/ticket-tracker/routes");
 
 const app = express();
 const PORT = 3000;
-const DATA_FILE = path.join(__dirname, "tickets.json");
+const SESSION_COOKIE = "session_id";
+const sessions = new Map(); // sessionId -> { userId, username, roles }
 
-const PRIORITIES = new Set(["Low", "Medium", "High"]);
-const STATUSES = new Set(["REPORTED", "RECEIVED", "IN_PROGRESS", "DONE", "CLOSED"]);
-const ALLOWED_TRANSITIONS = {
-  REPORTED: ["RECEIVED", "CLOSED"],
-  RECEIVED: ["IN_PROGRESS", "REPORTED"],
-  IN_PROGRESS: ["DONE", "RECEIVED"],
-  DONE: ["CLOSED", "IN_PROGRESS"],
-  CLOSED: ["IN_PROGRESS"]
-};
+const ticketStore = createJsonFileStore(path.join(__dirname, "tickets.json"));
+const tickets = createTicketRoutes(ticketStore);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
-function ensureDataFile() {
-  if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, "[]\n", "utf8");
-  }
-}
-
-function readTickets() {
-  ensureDataFile();
-  try {
-    const raw = fs.readFileSync(DATA_FILE, "utf8").trim();
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    console.error("Failed to read tickets.json", error);
-    return [];
-  }
-}
-
-function writeTickets(tickets) {
-  fs.writeFileSync(DATA_FILE, `${JSON.stringify(tickets, null, 2)}\n`, "utf8");
-}
-
-function nextTicketId(tickets) {
-  const maxId = tickets.reduce((max, ticket) => {
-    const match = /^TCK-(\d+)$/.exec(ticket.id || "");
-    return match ? Math.max(max, Number(match[1])) : max;
-  }, 1000);
-  return `TCK-${maxId + 1}`;
-}
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function validateCreatePayload(body) {
-  const errors = {};
-  const reporterName = cleanString(body.reporter_name);
-  const title = cleanString(body.title);
-  const description = cleanString(body.description);
-  const priority = cleanString(body.priority) || "Medium";
-
-  if (!reporterName) errors.reporter_name = "Reporter name is required.";
-  if (!title) errors.title = "Issue title is required.";
-  if (title.length > 100) errors.title = "Issue title must be 100 characters or fewer.";
-  if (!description) errors.description = "Description is required.";
-  if (!PRIORITIES.has(priority)) errors.priority = "Priority must be Low, Medium, or High.";
-
-  return {
-    errors,
-    data: { reporter_name: reporterName, title, description, priority }
-  };
+function parseCookies(req) {
+  const header = req.headers.cookie;
+  if (!header) return {};
+  return header.split(";").reduce((acc, pair) => {
+    const index = pair.indexOf("=");
+    if (index === -1) return acc;
+    acc[pair.slice(0, index).trim()] = decodeURIComponent(pair.slice(index + 1).trim());
+    return acc;
+  }, {});
 }
 
-function sortNewestFirst(tickets) {
-  return [...tickets].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+function setSessionCookie(res, sessionId) {
+  res.setHeader("Set-Cookie", `${SESSION_COOKIE}=${sessionId}; HttpOnly; SameSite=Lax; Path=/`);
+}
+
+function clearSessionCookie(res) {
+  res.setHeader("Set-Cookie", `${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`);
+}
+
+function getSessionId(req) {
+  return parseCookies(req)[SESSION_COOKIE];
+}
+
+const authProvider = createCredentialStoreAdapter({
+  verify: async (sessionId) => {
+    const session = sessionId && sessions.get(sessionId);
+    return session ? { userId: session.userId, roles: session.roles } : null;
+  }
+});
+
+async function requireHandler(req) {
+  const context = await requireUser(authProvider, { credential: getSessionId(req) });
+  return requireRole(context, "handler");
+}
+
+function withHandlerAuth(handler) {
+  return async (req, res) => {
+    try {
+      await requireHandler(req);
+    } catch (error) {
+      if (error instanceof AuthError) return res.status(error.status).json({ error: error.message });
+      return res.status(500).json({ error: "Internal error" });
+    }
+    return handler(req, res);
+  };
 }
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/api/tickets", (req, res) => {
-  const { errors, data } = validateCreatePayload(req.body || {});
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({ error: "Validation failed", errors });
+app.post("/api/auth/login", (req, res) => {
+  const username = cleanString(req.body && req.body.username);
+  const password = typeof (req.body && req.body.password) === "string" ? req.body.password : "";
+  const user = findUserByUsername(username);
+
+  if (!user || !verifyPassword(password, user.passwordSalt, user.passwordHash)) {
+    return res.status(401).json({ error: "Invalid credentials" });
   }
 
-  const tickets = readTickets();
-  const now = new Date().toISOString();
-  const ticket = {
-    id: nextTicketId(tickets),
-    title: data.title,
-    description: data.description,
-    reporter_name: data.reporter_name,
-    priority: data.priority,
-    status: "REPORTED",
-    handler_notes: "",
-    created_at: now,
-    updated_at: now
-  };
-
-  tickets.push(ticket);
-  writeTickets(tickets);
-  return res.status(201).json(ticket);
+  const sessionId = crypto.randomUUID();
+  sessions.set(sessionId, { userId: user.id, username: user.username, roles: user.roles });
+  setSessionCookie(res, sessionId);
+  return res.json({ ok: true });
 });
 
-app.get("/api/tickets", (req, res) => {
-  const status = cleanString(req.query.status);
-  const priority = cleanString(req.query.priority);
-
-  if (status && !STATUSES.has(status)) {
-    return res.status(400).json({ error: "Invalid status filter" });
-  }
-  if (priority && !PRIORITIES.has(priority)) {
-    return res.status(400).json({ error: "Invalid priority filter" });
-  }
-
-  let tickets = readTickets();
-  if (status) tickets = tickets.filter((ticket) => ticket.status === status);
-  if (priority) tickets = tickets.filter((ticket) => ticket.priority === priority);
-  return res.json(sortNewestFirst(tickets));
+app.post("/api/auth/logout", (req, res) => {
+  const sessionId = getSessionId(req);
+  if (sessionId) sessions.delete(sessionId);
+  clearSessionCookie(res);
+  return res.json({ ok: true });
 });
 
-app.get("/api/tickets/:id", (req, res) => {
-  const ticketId = cleanString(req.params.id).toUpperCase();
-  const ticket = readTickets().find((item) => item.id === ticketId);
-  if (!ticket) {
-    return res.status(404).json({ error: "Ticket not found" });
+app.get("/api/auth/me", async (req, res) => {
+  try {
+    const context = await requireUser(authProvider, { credential: getSessionId(req) });
+    const session = sessions.get(getSessionId(req));
+    return res.json({ userId: context.userId, username: session.username, roles: context.roles });
+  } catch (error) {
+    if (error instanceof AuthError) return res.status(error.status).json({ error: error.message });
+    return res.status(500).json({ error: "Internal error" });
   }
-  return res.json(ticket);
 });
 
-app.patch("/api/tickets/:id/status", (req, res) => {
-  const ticketId = cleanString(req.params.id).toUpperCase();
-  const targetStatus = cleanString(req.body && req.body.status);
-  const handlerNotes = cleanString(req.body && req.body.handler_notes);
+// Reporter-facing routes — no login required.
+app.post("/api/tickets", tickets.createTicket);
+app.get("/api/tickets/:id", tickets.getTicket);
 
-  if (!STATUSES.has(targetStatus)) {
-    return res.status(400).json({ error: "Invalid target status" });
-  }
-
-  const tickets = readTickets();
-  const index = tickets.findIndex((item) => item.id === ticketId);
-  if (index === -1) {
-    return res.status(404).json({ error: "Ticket not found" });
-  }
-
-  const current = tickets[index];
-  const allowed = ALLOWED_TRANSITIONS[current.status] || [];
-  if (!allowed.includes(targetStatus)) {
-    return res.status(400).json({
-      error: "Invalid status transition",
-      current_status: current.status,
-      allowed_statuses: allowed
-    });
-  }
-
-  const updated = {
-    ...current,
-    status: targetStatus,
-    handler_notes: handlerNotes,
-    updated_at: new Date().toISOString()
-  };
-  tickets[index] = updated;
-  writeTickets(tickets);
-  return res.json(updated);
-});
+// Handler dashboard routes — login required.
+app.get("/api/tickets", withHandlerAuth(tickets.listTickets));
+app.patch("/api/tickets/:id/status", withHandlerAuth(tickets.updateStatus));
 
 app.use((req, res) => {
   if (req.path.startsWith("/api/")) {
@@ -182,7 +130,7 @@ app.use((err, _req, res, next) => {
   return next(err);
 });
 
-ensureDataFile();
+ensureUsersFile();
 app.listen(PORT, () => {
   console.log(`Ticket Tracker MVP running at http://localhost:${PORT}`);
 });

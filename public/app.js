@@ -50,7 +50,16 @@ async function requestJson(url, options = {}) {
   return data;
 }
 
-function showView(name) {
+async function showView(name) {
+  if (name === "dashboard") {
+    try {
+      await requestJson("/api/auth/me");
+    } catch (_error) {
+      window.location.hash = "#login";
+      return;
+    }
+  }
+
   $$(".view").forEach((view) => view.classList.add("hidden"));
   $(`#${name}-view`).classList.remove("hidden");
   $$("[data-nav]").forEach((link) => link.classList.toggle("active", link.dataset.nav === name));
@@ -59,7 +68,31 @@ function showView(name) {
 
 function handleRoute() {
   const route = (window.location.hash || "#submit").replace("#", "");
-  showView(["submit", "track", "dashboard"].includes(route) ? route : "submit");
+  showView(["submit", "track", "dashboard", "login"].includes(route) ? route : "submit");
+}
+
+async function login(event) {
+  event.preventDefault();
+  $("#login-error").textContent = "";
+
+  try {
+    await requestJson("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        username: $("#login-username").value,
+        password: $("#login-password").value
+      })
+    });
+    $("#login-form").reset();
+    window.location.hash = "#dashboard";
+  } catch (error) {
+    $("#login-error").textContent = error.response?.error || "Unable to log in.";
+  }
+}
+
+async function logout() {
+  await requestJson("/api/auth/logout", { method: "POST" });
+  window.location.hash = "#submit";
 }
 
 function clearFieldErrors() {
@@ -245,6 +278,8 @@ async function updateStatus() {
 document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("hashchange", handleRoute);
   $("#ticket-form").addEventListener("submit", submitTicket);
+  $("#login-form").addEventListener("submit", login);
+  $("#logout-button").addEventListener("click", logout);
   $("#search-ticket").addEventListener("click", searchTicket);
   $("#track-id").addEventListener("keydown", (event) => {
     if (event.key === "Enter") searchTicket();
