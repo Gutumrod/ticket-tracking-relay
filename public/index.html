@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,106 +10,107 @@
     <header class="topbar">
       <div class="brand">Ticket Tracker MVP</div>
       <nav class="tabs" aria-label="Primary navigation">
-        <a href="#submit" data-nav="submit">Report Issue</a>
-        <a href="#track" data-nav="track">Track Ticket</a>
-        <a href="#dashboard" data-nav="dashboard">Handler Dashboard</a>
+        <a href="#submit" data-nav="submit" data-i18n="nav_submit">Report Issue</a>
+        <a href="#track" data-nav="track" data-i18n="nav_track">Track Ticket</a>
+        <a href="#dashboard" data-nav="dashboard" data-i18n="nav_dashboard">Handler Dashboard</a>
       </nav>
+      <button id="lang-toggle" type="button" class="lang-toggle"></button>
     </header>
 
     <main class="shell">
       <section id="submit-view" class="view">
         <div class="section-head">
-          <h1>Report an Issue</h1>
+          <h1 data-i18n="submit_title">Report an Issue</h1>
         </div>
         <form id="ticket-form" class="panel" novalidate>
           <label>
-            <span>Reporter Name</span>
-            <input id="reporter-name" name="reporter_name" type="text" placeholder="Your Name" required>
+            <span data-i18n="label_reporter_name">Reporter Name</span>
+            <input id="reporter-name" name="reporter_name" type="text" data-i18n-placeholder="placeholder_reporter_name" placeholder="Your Name" required>
             <small class="field-error" data-error-for="reporter_name"></small>
           </label>
 
           <label>
-            <span>Issue Title</span>
-            <input id="ticket-title" name="title" type="text" maxlength="100" placeholder="Brief summary of the problem" required>
+            <span data-i18n="label_title">Issue Title</span>
+            <input id="ticket-title" name="title" type="text" maxlength="100" data-i18n-placeholder="placeholder_title" placeholder="Brief summary of the problem" required>
             <small class="field-error" data-error-for="title"></small>
           </label>
 
           <label>
-            <span>Priority</span>
+            <span data-i18n="label_priority">Priority</span>
             <select id="ticket-priority" name="priority">
-              <option value="Low">Low</option>
-              <option value="Medium" selected>Medium</option>
-              <option value="High">High</option>
+              <option value="Low" data-i18n="priority_low">Low</option>
+              <option value="Medium" selected data-i18n="priority_medium">Medium</option>
+              <option value="High" data-i18n="priority_high">High</option>
             </select>
             <small class="field-error" data-error-for="priority"></small>
           </label>
 
           <label>
-            <span>Description</span>
-            <textarea id="ticket-description" name="description" rows="4" placeholder="Provide details about the issue..." required></textarea>
+            <span data-i18n="label_description">Description</span>
+            <textarea id="ticket-description" name="description" rows="4" data-i18n-placeholder="placeholder_description" placeholder="Provide details about the issue..." required></textarea>
             <small class="field-error" data-error-for="description"></small>
           </label>
 
-          <button class="primary" type="submit">Submit Ticket</button>
+          <button class="primary" type="submit" data-i18n="btn_submit_ticket">Submit Ticket</button>
         </form>
 
         <div id="success-banner" class="success-banner hidden" role="status">
-          <strong>Ticket Submitted Successfully!</strong>
-          <p>Your Ticket ID is <b id="new-ticket-id"></b>.</p>
+          <strong data-i18n="success_title">Ticket Submitted Successfully!</strong>
+          <p><span data-i18n="success_ticket_id_prefix">Your Ticket ID is</span> <b id="new-ticket-id"></b>.</p>
           <div class="button-row">
-            <button id="copy-ticket-id" type="button">Copy Ticket ID</button>
-            <button id="track-new-ticket" type="button">Track Status</button>
+            <button id="copy-ticket-id" type="button" data-i18n="btn_copy_id">Copy Ticket ID</button>
+            <button id="track-new-ticket" type="button" data-i18n="btn_track_status">Track Status</button>
           </div>
         </div>
       </section>
 
       <section id="track-view" class="view hidden">
         <div class="section-head">
-          <h1>Track Ticket Status</h1>
+          <h1 data-i18n="track_title">Track Ticket Status</h1>
         </div>
         <div class="search-bar panel">
-          <input id="track-id" type="text" placeholder="Enter Ticket ID, e.g. TCK-1001">
-          <button id="search-ticket" class="primary" type="button">Search</button>
+          <input id="track-id" type="text" data-i18n-placeholder="placeholder_track_id" placeholder="Enter Ticket ID, e.g. TCK-1001">
+          <button id="search-ticket" class="primary" type="button" data-i18n="btn_search">Search</button>
         </div>
-        <div id="track-error" class="error-callout hidden">Ticket ID not found. Please verify your ID.</div>
+        <div id="track-error" class="error-callout hidden" data-i18n="track_not_found">Ticket ID not found. Please verify your ID.</div>
         <div id="track-result"></div>
       </section>
 
       <section id="login-view" class="view hidden">
         <div class="section-head">
-          <h1>Handler Login</h1>
+          <h1 data-i18n="login_title">Handler Login</h1>
         </div>
         <form id="login-form" class="panel" novalidate>
           <label>
-            <span>Username</span>
+            <span data-i18n="label_username">Username</span>
             <input id="login-username" name="username" type="text" required>
           </label>
           <label>
-            <span>Password</span>
+            <span data-i18n="label_password">Password</span>
             <input id="login-password" name="password" type="password" required>
           </label>
           <p id="login-error" class="field-error"></p>
-          <button class="primary" type="submit">Log In</button>
+          <button class="primary" type="submit" data-i18n="btn_login">Log In</button>
         </form>
       </section>
 
       <section id="dashboard-view" class="view hidden">
         <div class="section-head">
-          <h1>Handler Dashboard</h1>
-          <button id="logout-button" type="button">Log Out</button>
+          <h1 data-i18n="dashboard_title">Handler Dashboard</h1>
+          <button id="logout-button" type="button" data-i18n="btn_logout">Log Out</button>
         </div>
 
         <div class="metrics">
-          <article><span>Total Tickets</span><b id="metric-total">0</b></article>
-          <article><span>Reported</span><b id="metric-reported">0</b></article>
-          <article><span>Received</span><b id="metric-received">0</b></article>
-          <article><span>In Progress</span><b id="metric-progress">0</b></article>
-          <article><span>Done</span><b id="metric-done">0</b></article>
+          <article><span data-i18n="metric_total">Total Tickets</span><b id="metric-total">0</b></article>
+          <article><span data-i18n="metric_reported">Reported</span><b id="metric-reported">0</b></article>
+          <article><span data-i18n="metric_received">Received</span><b id="metric-received">0</b></article>
+          <article><span data-i18n="metric_progress">In Progress</span><b id="metric-progress">0</b></article>
+          <article><span data-i18n="metric_done">Done</span><b id="metric-done">0</b></article>
         </div>
 
         <div class="filters panel">
           <select id="status-filter">
-            <option value="">All Statuses</option>
+            <option value="" data-i18n="filter_all_statuses">All Statuses</option>
             <option value="REPORTED">REPORTED</option>
             <option value="RECEIVED">RECEIVED</option>
             <option value="IN_PROGRESS">IN_PROGRESS</option>
@@ -117,30 +118,30 @@
             <option value="CLOSED">CLOSED</option>
           </select>
           <select id="priority-filter">
-            <option value="">All Priorities</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
+            <option value="" data-i18n="filter_all_priorities">All Priorities</option>
+            <option value="Low" data-i18n="priority_low">Low</option>
+            <option value="Medium" data-i18n="priority_medium">Medium</option>
+            <option value="High" data-i18n="priority_high">High</option>
           </select>
-          <input id="dashboard-search" type="search" placeholder="Search by Ticket ID or Title">
+          <input id="dashboard-search" type="search" data-i18n-placeholder="placeholder_dashboard_search" placeholder="Search by Ticket ID or Title">
         </div>
 
         <div class="table-wrap panel">
           <table>
             <thead>
               <tr>
-                <th>Ticket ID</th>
-                <th>Title</th>
-                <th>Reporter</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Actions</th>
+                <th data-i18n="th_ticket_id">Ticket ID</th>
+                <th data-i18n="th_title">Title</th>
+                <th data-i18n="th_reporter">Reporter</th>
+                <th data-i18n="th_priority">Priority</th>
+                <th data-i18n="th_status">Status</th>
+                <th data-i18n="th_created_at">Created At</th>
+                <th data-i18n="th_actions">Actions</th>
               </tr>
             </thead>
             <tbody id="tickets-table"></tbody>
           </table>
-          <p id="empty-table" class="muted hidden">No tickets match the current filters.</p>
+          <p id="empty-table" class="muted hidden" data-i18n="empty_table">No tickets match the current filters.</p>
         </div>
       </section>
     </main>
@@ -153,16 +154,16 @@
         </div>
         <div id="modal-detail" class="detail-grid"></div>
         <label>
-          <span>Status Transition</span>
+          <span data-i18n="label_status_transition">Status Transition</span>
           <select id="status-transition"></select>
         </label>
         <label>
-          <span>Handler Notes</span>
-          <textarea id="handler-notes" rows="4" placeholder="Progress or resolution comments"></textarea>
+          <span data-i18n="label_handler_notes">Handler Notes</span>
+          <textarea id="handler-notes" rows="4" data-i18n-placeholder="placeholder_handler_notes" placeholder="Progress or resolution comments"></textarea>
         </label>
         <p id="modal-error" class="field-error"></p>
         <div class="button-row end">
-          <button id="update-status" class="primary" type="button">Update Status</button>
+          <button id="update-status" class="primary" type="button" data-i18n="btn_update_status">Update Status</button>
         </div>
       </form>
     </dialog>

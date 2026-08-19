@@ -63,6 +63,12 @@ body {
   background: #f0fdfa;
 }
 
+.lang-toggle {
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
 .shell {
   width: min(1120px, calc(100% - 32px));
   margin: 32px auto;
